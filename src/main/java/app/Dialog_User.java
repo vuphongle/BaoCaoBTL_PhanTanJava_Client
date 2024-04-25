@@ -29,6 +29,7 @@ import java.awt.Window;
 
 import javax.swing.UIManager;
 
+import dao.ClientConnectionService;
 import dao.DangNhapServices;
 import dao.NhanVienService;
 import entity.NhanVien;
@@ -56,8 +57,10 @@ public class Dialog_User extends JDialog implements ActionListener{
 	private final String trangthaidangnhap;
     private String hinhanh_url;
     private InetAddress ip;
+    private ClientConnectionService clientConnectionService;
 //	private GD_TrangDangNhap gd_dangNhap = new GD_TrangDangNhap(); 
 	public Dialog_User() throws RemoteException, MalformedURLException, NotBoundException {
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		try {
 			ip = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
@@ -77,7 +80,7 @@ public class Dialog_User extends JDialog implements ActionListener{
 				NhanVien nv = null;
 				try {
 					String mnv = "";
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
 							mnv = entry.getValue();

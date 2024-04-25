@@ -35,6 +35,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 
+import dao.ClientConnectionService;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
 import dao.PhieuDatPhongService;
@@ -99,9 +100,11 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 	private Dialog_HienThiPhong dialog_HienThiPhong;
 	private final JButton btnDatPhong;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 
 	public Dialog_PhongCho(String maPhong, GD_TrangChu trangChu) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		ip = InetAddress.getLocalHost();
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		p_Service= (PhongService) Naming.lookup(DataManager.getRmiURL() + "phongServices");
 		lp_dao = (LoaiPhongServices) Naming.lookup(DataManager.getRmiURL()+"loaiPhongServices");
 		pdp_Service = (PhieuDatPhongService) Naming.lookup(DataManager.getRmiURL()+"phieuDatPhongServices");
@@ -459,8 +462,20 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					Map<String, Boolean> loadData = DataManager.getLoadData();
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, Boolean> loadData = null;
+					try {
+						loadData = clientConnectionService.getLoadData();
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					Map<String, String> mapIP_MSNV = null;
+					try {
+						mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					String mnv = "";
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
@@ -470,6 +485,12 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
  					
 					for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 							entry.setValue(true);
+					}
+					try {
+						clientConnectionService.setLoadData(loadData);
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 					Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 					Phong phong = new Phong(lblPhong_1.getText(), trangThai);
@@ -499,8 +520,20 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = null;
+				try {
+					loadData = clientConnectionService.getLoadData();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Map<String, String> mapIP_MSNV = null;
+				try {
+					mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -510,6 +543,12 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 					
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
+				}
+				try {
+					clientConnectionService.setLoadData(loadData);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 				Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 				Phong phong = new Phong(lblPhong_1.getText(), trangThai);
@@ -541,8 +580,20 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = null;
+				try {
+					loadData = clientConnectionService.getLoadData();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Map<String, String> mapIP_MSNV = null;
+				try {
+					mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -552,6 +603,12 @@ public class Dialog_PhongCho extends JDialog implements ActionListener {
 					
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
+				}
+				try {
+					clientConnectionService.setLoadData(loadData);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 				Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 				Phong phong = new Phong(lblPhong_1.getText(), trangThai);

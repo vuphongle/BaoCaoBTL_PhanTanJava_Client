@@ -43,6 +43,7 @@ import entity.PhieuDatPhong;
 import entity.Phong;
 import entity.TempDatPhong;
 import entity.TempThanhToan;
+import dao.ClientConnectionService;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
 import dao.PhieuDatPhongService;
@@ -123,8 +124,10 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 	 * @throws NotBoundException 
 	 * @throws MalformedURLException 
 	 */
-
+	private ClientConnectionService clientConnectionService;
 	public GD_DatPhong(GD_TrangChu trangChu) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
+		
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		ip = InetAddress.getLocalHost();
 		lp_dao = (LoaiPhongServices) Naming.lookup(DataManager.getRmiURL() + "loaiPhongServices");
 		kh_dao = (KhachHangServices) Naming.lookup(DataManager.getRmiURL() + "khachHangServices");
@@ -389,8 +392,20 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 					e1.printStackTrace();
 				}
 
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = null;
+				try {
+					loadData = clientConnectionService.getLoadData();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Map<String, String> mapIP_MSNV = null;
+				try {
+					mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						mnv = entry.getValue();

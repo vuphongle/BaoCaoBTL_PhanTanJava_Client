@@ -61,6 +61,7 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 
 import dao.ChiTietDichVuServices;
 import dao.ChiTietHoaDonServices;
+import dao.ClientConnectionService;
 import dao.HoaDonDatPhongServices;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
@@ -134,9 +135,11 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 	private final DecimalFormat df;
 	private final SanPhamService sp_Service;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 
 	public Dialog_DatPhongTrong_2(String maPhong, Phong p, LoaiPhong lp, int soNguoi, GD_TrangChu trangChu) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		ip = InetAddress.getLocalHost();
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		df = new DecimalFormat("#,###,### VNĐ");
 		// màn
 		// hình******************************************************************************
@@ -557,7 +560,7 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 		}
 	}
 
-	private void themDV() {
+	private void themDV() throws RemoteException {
 		if (tblThemPhongMoi.getSelectedRow() == -1) {
 			JOptionPane.showMessageDialog(null, "Bạn chưa chọn phòng để thêm dịch vụ!");
 		} else if (tblThemPhongMoi.getSelectedRowCount() > 1) {
@@ -566,7 +569,7 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 			if (!lbl_TenKH_1.getText().equals("")) {
 				String customer = lbl_TenKH_1.getText();
 				String mnv = "";
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						mnv = entry.getValue();
@@ -607,7 +610,12 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 			}
 		}
 		if (o.equals(btn_ThemDV)) {
-			themDV();
+			try {
+				themDV();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		if (o.equals(btn_DatPhong)) {
 			int check = 0;
@@ -639,7 +647,7 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 
 							// Thêm phiếu đặt phòng
 							String mnv = "";
-							Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+							Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 							for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 								if (entry.getKey().equals(ip.getHostAddress())) {
 									mnv = entry.getValue();
@@ -733,18 +741,45 @@ public class Dialog_DatPhongTrong_2 extends JDialog implements ActionListener, M
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = null;
+				try {
+					loadData = clientConnectionService.getLoadData();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
+					System.out.println(entry.getKey() + " " + entry.getValue());
+				}
+				Map<String, String> mapIP_MSNV = null;
+				try {
+					mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						mnv = entry.getValue();
 					}
 				}
-					
+				
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
 				}
+				try {
+					clientConnectionService.setLoadData(loadData);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
+					System.out.println(entry.getKey() + " " + entry.getValue());
+				}
+				
+				
 				DataManager.setCtdvTempList(null);
 				JOptionPane.showMessageDialog(this, "Đặt phòng thành công, thời gian bắt đầu được tính!");
 				DataManager.setSoDienThoaiKHDat("");

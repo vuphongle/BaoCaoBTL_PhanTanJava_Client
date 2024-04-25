@@ -51,6 +51,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import dao.ChiTietDichVuServices;
 import dao.ChiTietHoaDonServices;
+import dao.ClientConnectionService;
 import dao.HoaDonDatPhongServices;
 import dao.KhachHangServices;
 import dao.KhuyenMaiServices;
@@ -163,9 +164,11 @@ public class Dialog_ThanhToan extends JDialog implements ActionListener {
 	private final String maPh;
 	private final JTextField txtTienGiam;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 
 	public Dialog_ThanhToan(String maPhong) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		ip = InetAddress.getLocalHost();
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		this.maPh = maPhong;
 		getContentPane().setBackground(Color.WHITE);
 		getContentPane().setLayout(null);
@@ -193,7 +196,7 @@ public class Dialog_ThanhToan extends JDialog implements ActionListener {
 				NhanVien nv = null;
 				try {
 					String mnv = "";
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
 							mnv = entry.getValue();
@@ -985,7 +988,7 @@ public class Dialog_ThanhToan extends JDialog implements ActionListener {
 					String maKH = kh.getMaKhachHang();
 					KhachHang kh_update = new KhachHang(maKH);
 					String maNV = "";
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
 							maNV = entry.getValue();
@@ -1090,8 +1093,8 @@ public class Dialog_ThanhToan extends JDialog implements ActionListener {
 
 					JOptionPane.showMessageDialog(this, "Thanh Toán thành công");
 					tempTT_dao.deleteALLTempThanhToan();
-					Map<String, Boolean> loadData = DataManager.getLoadData();
-					Map<String, String> mapIP_MSNV1 = DataManager.getMapIP_MSNV();
+					Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+					Map<String, String> mapIP_MSNV1 = clientConnectionService.getMapIP_MSNV();
 					String mnv = "";
 					for (Map.Entry<String, String> entry : mapIP_MSNV1.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1102,6 +1105,7 @@ public class Dialog_ThanhToan extends JDialog implements ActionListener {
 					for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 							entry.setValue(true);
 					}
+					clientConnectionService.setLoadData(loadData);
 					DataManager.setSoDienThoaiKHDat("");
 
 					if (chckbx_XuatHoaDon.isSelected()) {

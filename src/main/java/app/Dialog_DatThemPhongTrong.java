@@ -30,6 +30,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 
+import dao.ClientConnectionService;
 import dao.PhongService;
 import entity.Phong;
 
@@ -76,7 +77,9 @@ public class Dialog_DatThemPhongTrong extends JDialog implements ActionListener{
 	private final JTextField txtHoten;
 	private PhongService p_Service ;
 	private InetAddress ip;
-	public Dialog_DatThemPhongTrong(String hoten) {
+	private ClientConnectionService clientConnectionService;
+	public Dialog_DatThemPhongTrong(String hoten) throws MalformedURLException, RemoteException, NotBoundException {
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		try {
 			ip = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
@@ -300,7 +303,7 @@ public class Dialog_DatThemPhongTrong extends JDialog implements ActionListener{
 			
 			try {
 				String mnv = "";
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						mnv = entry.getValue();

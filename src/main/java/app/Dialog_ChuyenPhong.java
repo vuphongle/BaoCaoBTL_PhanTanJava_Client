@@ -39,6 +39,7 @@ import javax.swing.table.DefaultTableModel;
 
 import dao.ChiTietDichVuServices;
 import dao.ChiTietHoaDonServices;
+import dao.ClientConnectionService;
 import dao.HoaDonDatPhongServices;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
@@ -109,8 +110,11 @@ public class Dialog_ChuyenPhong extends JDialog implements ActionListener, Mouse
 	private final JLabel lblPhongHienTai_1;
 	private final TempPhongBiChuyenServices tempChuyen_dao;
 	private  ChiTietDichVuServices ctdv_dao;
+	private ClientConnectionService clientConnectionService;
+	
 	public Dialog_ChuyenPhong(String maPhong, String soNguoi) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		ip = InetAddress.getLocalHost();
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		getContentPane().setBackground(Color.WHITE);
 		setSize(800, 480);
 		setLocationRelativeTo(null);
@@ -133,7 +137,7 @@ public class Dialog_ChuyenPhong extends JDialog implements ActionListener, Mouse
 				NhanVien nv = null;
 				try {
 					String mnv = "";
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
 							mnv = entry.getValue();
@@ -540,8 +544,8 @@ public class Dialog_ChuyenPhong extends JDialog implements ActionListener, Mouse
 					
 					JOptionPane.showMessageDialog(null,
 							"Chuyển sang phòng " + model.getValueAt(tblChuyenPhong.getSelectedRow(), 0) + " thành công!!");
-					Map<String, Boolean> loadData = DataManager.getLoadData();
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					String mnv = "";
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
@@ -552,6 +556,7 @@ public class Dialog_ChuyenPhong extends JDialog implements ActionListener, Mouse
 					for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 							entry.setValue(true);
 					}	
+					clientConnectionService.setLoadData(loadData);
 
 					//Chuyển dịch vụ sang phòng mới
 					List<ChiTietDichVu> dsChiTietDV = ctdv_dao.getChiTietDichVuTheoMaHDVaMaPhong(maHD, txtMa.getText());

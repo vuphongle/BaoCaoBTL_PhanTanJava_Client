@@ -48,7 +48,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-
+import dao.ClientConnectionService;
 import dao.HoaDonDatPhongServices;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
@@ -118,8 +118,11 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 	private Dialog_PhongDangSD dialog_PhongDangSD;
 	private Dialog_TimPDP_DaThanhToan dialog_TimPDP_DaThanhToan;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 	public Dialog_TimPhieuDatPhong() throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		ip = InetAddress.getLocalHost();
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
+		
 		tmp_dao = (TempDatPhongServices) Naming.lookup(DataManager.getRmiURL() + "tempDatPhongServices"); 
 		p_Service =(PhongService) Naming.lookup(DataManager.getRmiURL() + "phongServices");
 		pdp_Service = (PhieuDatPhongService) Naming.lookup(DataManager.getRmiURL() + "phieuDatPhongServices");
@@ -1008,8 +1011,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				if (tb == JOptionPane.YES_OPTION) {
 					JOptionPane.showMessageDialog(this, "Phòng hủy thành công!");
 					pdp_Service.xoaPhieuDatPhongTheoMa(maphong);
-					Map<String, Boolean> loadData = DataManager.getLoadData();
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					String mnv = "";
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1020,6 +1023,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 					for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 							entry.setValue(true);
 					}
+					clientConnectionService.setLoadData(loadData);
 					Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 					Phong phong = new Phong(maphong, trangThai);
 					try {
@@ -1063,8 +1067,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				} catch (RemoteException | MalformedURLException | NotBoundException e) {
 					e.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1075,6 +1079,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
 				}
+				clientConnectionService.setLoadData(loadData);
 				dialog_PhongCho.setModal(true);
 				dialog_PhongCho.setVisible(true);
 			} else if (hinhthuc.equals("Đặt trước") && p.getTrangThai() == Enum_TrangThai.Dang_su_dung) {
@@ -1083,8 +1088,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				} catch (RemoteException | MalformedURLException | NotBoundException e) {
 					e.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1095,6 +1100,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
 				}
+				clientConnectionService.setLoadData(loadData);
 				dialog_PhongDangSD.setModal(true);
 				dialog_PhongDangSD.setVisible(true);
 			} else if (hinhthuc.equals("Đặt trực tiếp") && trangthai.equals("Chưa TT")
@@ -1104,8 +1110,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				} catch (RemoteException | MalformedURLException | NotBoundException e) {
 					e.printStackTrace();
 				}
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1116,6 +1122,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
 				}
+				clientConnectionService.setLoadData(loadData);
 				dialog_PhongDangSD.setModal(true);
 				dialog_PhongDangSD.setVisible(true);
 
@@ -1132,8 +1139,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 					e.printStackTrace();
 				}
 
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1144,6 +1151,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 						entry.setValue(true);
 				}
+				clientConnectionService.setLoadData(loadData);
 				dialog_TimPDP_DaThanhToan.setModal(true);
 				dialog_TimPDP_DaThanhToan.setVisible(true);
 			}
@@ -1224,8 +1232,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 						// Thực hiện công việc B
 						JOptionPane.showMessageDialog(this, "Phòng hủy do đến trễ quá 30 phút!");
 						pdp_Service.xoaPhieuDatPhongTheoMa(maphong);
-						Map<String, Boolean> loadData = DataManager.getLoadData();
-						Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+						Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+						Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 						String mnv = "";
 						for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 							if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1236,6 +1244,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 						for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 								entry.setValue(true);
 						}
+						clientConnectionService.setLoadData(loadData);
 						Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 						Phong phong = new Phong(maphong, trangThai);
 						p_Service.updatePhong(phong, maphong);
@@ -1254,8 +1263,8 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 					// Thực hiện công việc B
 					JOptionPane.showMessageDialog(this, "Phòng hủy do đến trễ quá 30 phút!");
 					pdp_Service.xoaPhieuDatPhongTheoMa(maphong);
-					Map<String, Boolean> loadData = DataManager.getLoadData();
-					Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+					Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+					Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 					String mnv = "";
 					for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 						if (entry.getKey().equals(ip.getHostAddress())) {
@@ -1266,6 +1275,7 @@ public class Dialog_TimPhieuDatPhong extends JDialog implements ActionListener, 
 					for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 							entry.setValue(true);
 					}
+					clientConnectionService.setLoadData(loadData);
 					Enum_TrangThai trangThai = Enum_TrangThai.Trong;
 					Phong phong = new Phong(maphong, trangThai);
 					p_Service.updatePhong(phong, maphong);

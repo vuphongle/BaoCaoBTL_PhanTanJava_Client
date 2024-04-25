@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.border.CompoundBorder;
 
+import dao.ClientConnectionService;
 import dao.PhongService;
 import dao.TempDatPhongServices;
 import entity.Phong;
@@ -79,9 +80,12 @@ public class GD_TrangChu extends JFrame implements ActionListener, WindowListene
 	private Dialog_User dialog_User= new Dialog_User();
 	private InetAddress ip;
 	
-
+	private ClientConnectionService clientConnectionService;
 	public GD_TrangChu() throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		super("Karaoke 4T");
+		
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
+		
 		ip = InetAddress.getLocalHost();
 		tmp_dao = (TempDatPhongServices) Naming.lookup(DataManager.getRmiURL() + "tempDatPhongServices");
 		thongKe = new GD_ThongKe();
@@ -685,8 +689,19 @@ public class GD_TrangChu extends JFrame implements ActionListener, WindowListene
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Map<String, Boolean> loadData = DataManager.getLoadData();
-		Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+		try {
+			Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		Map<String, String> mapIP_MSNV = null;
+		try {
+			mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String mnv = "";
 		String ip_tam = "";
 		for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
@@ -695,9 +710,14 @@ public class GD_TrangChu extends JFrame implements ActionListener, WindowListene
 				ip_tam = entry.getKey();
 			}
 		}
-		DataManager.deleteFromMapIP_MSNV(ip.getHostAddress());
+		try {
+			clientConnectionService.deleteFromMapIP_MSNV(ip.getHostAddress());
+			clientConnectionService.deleteFromMapLoadData(mnv);
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
-		DataManager.deleteFromMapLoadData(mnv);
 	}
 
 	@Override

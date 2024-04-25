@@ -34,6 +34,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 
+import dao.ClientConnectionService;
 import dao.KhachHangServices;
 import dao.PhieuDatPhongService;
 import dao.PhongService;
@@ -92,10 +93,12 @@ public class Dialog_DatPhongCho extends JDialog implements ActionListener {
 	private LocalDateTime ngayGioDatPhong;
 	private LocalDateTime ngay_GioNhanPhong;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 
 	public Dialog_DatPhongCho(String maPhong, Phong p, LoaiPhong lp, int songuoi, GD_TrangChu trangChu)
 			throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
-
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
+		
 		// màn
 		// hình******************************************************************************
 		ip = InetAddress.getLocalHost();
@@ -344,8 +347,20 @@ public class Dialog_DatPhongCho extends JDialog implements ActionListener {
 			if (khachHang != null && khachHang.getHoTen().equals(lbl_TenKH_1.getText())) {
 				JOptionPane.showMessageDialog(this, "Đặt phòng thành công, thời gian bắt đầu được tính !");
 				DataManager.setSoDienThoaiKHDat("");
-				Map<String, Boolean> loadData = DataManager.getLoadData();
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, Boolean> loadData = null;
+				try {
+					loadData = clientConnectionService.getLoadData();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Map<String, String> mapIP_MSNV = null;
+				try {
+					mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String mnv = "";
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
@@ -356,6 +371,13 @@ public class Dialog_DatPhongCho extends JDialog implements ActionListener {
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 					entry.setValue(true);
 				}
+				try {
+					clientConnectionService.setLoadData(loadData);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				DataManager.setSoDienThoaiKHDatCho("");
 				DataManager.setMaPhongDatCho("");
 				DataManager.setSoNguoiHatDatCho("");
@@ -378,7 +400,13 @@ public class Dialog_DatPhongCho extends JDialog implements ActionListener {
 				String maPhong = lbl_Phong.getText();
 				Phong ph1 = new Phong(maPhong);
 				String maNV = "";
-				Map<String, String> mapIP_MSNV1 = DataManager.getMapIP_MSNV();
+				Map<String, String> mapIP_MSNV1 = null;
+				try {
+					mapIP_MSNV1 = clientConnectionService.getMapIP_MSNV();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				for (Map.Entry<String, String> entry : mapIP_MSNV1.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						maNV = entry.getValue();

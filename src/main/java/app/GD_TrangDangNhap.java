@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -32,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import dao.ClientConnectionService;
 import dao.DangNhapServices;
 import jakarta.persistence.Persistence;
 
@@ -46,6 +48,7 @@ public class GD_TrangDangNhap extends JFrame implements ActionListener {
 	private DangNhapServices dangNhap_dao;
 	private final GD_TrangChu gd_TrangChu;
 	private String username;
+	private ClientConnectionService clientConnectionService;
 
 	public GD_TrangDangNhap() throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		setTitle("Đăng Nhập KARAOKE 4T");
@@ -54,6 +57,7 @@ public class GD_TrangDangNhap extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		try {
 			dangNhap_dao = (DangNhapServices) Naming.lookup(DataManager.getRmiURL() + "dangNhapServices");
+			clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO: handle exception
@@ -215,33 +219,38 @@ public class GD_TrangDangNhap extends JFrame implements ActionListener {
 
 			try {
 				if (dangNhap_dao.Timkiem(username, mkstr)) {
-					if(DataManager.getLoadData() != null) {
-						int check = 0;
-						Map<String, Boolean> loadData = DataManager.getLoadData();
-						for (String key : loadData.keySet()) {
-							if (username.equals(key)) {
-					            JOptionPane.showMessageDialog(this, "Tài khoản đang được sử dụng ở máy khác!");
-					            check = 1;
-					            break;
-					        }
+					int check = 0;
+					Map<String, Boolean> loadData = clientConnectionService.getLoadData();
+					for (String key : loadData.keySet()) {
+						if (username.equals(key)) {
+							JOptionPane.showMessageDialog(this, "Tài khoản đang được sử dụng ở máy khác!");
+							check = 1;
+							break;
 						}
-						if(check == 0) {
-							DataManager.addLoadData(username, false);	
-							InetAddress ip = InetAddress.getLocalHost(); 
-							DataManager.addMapIP_MSNV(ip.getHostAddress(), username);
-							String roleName = dangNhap_dao.getRole(username, mkstr);
-							if (roleName.equals("Quản lý")) {
-								DataManager.setRole("QL");
-								DataManager.setRolePassword("QLpassword");
-							} else if (roleName.equals("Nhân viên")) {
-								DataManager.setRole("NV");
-								DataManager.setRolePassword("NVpassword");
-								gd_TrangChu.btnNhanVien.setEnabled(false);
-								gd_TrangChu.btnSanPham.setEnabled(false);
-							}
-							gd_TrangChu.setVisible(true);
-							dispose();
+					}
+					if (check == 0) {
+						loadData.put(username, false);
+						clientConnectionService.setLoadData(loadData);
+						InetAddress ip = InetAddress.getLocalHost();
+						
+						Map<String, String> mapIP_MSNV = new HashMap<>();
+						mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
+						mapIP_MSNV.put(ip.getHostAddress(), username);
+						
+						clientConnectionService.setMapIP_MSNV(mapIP_MSNV);
+						
+						String roleName = dangNhap_dao.getRole(username, mkstr);
+						if (roleName.equals("Quản lý")) {
+							DataManager.setRole("QL");
+							DataManager.setRolePassword("QLpassword");
+						} else if (roleName.equals("Nhân viên")) {
+							DataManager.setRole("NV");
+							DataManager.setRolePassword("NVpassword");
+							gd_TrangChu.btnNhanVien.setEnabled(false);
+							gd_TrangChu.btnSanPham.setEnabled(false);
 						}
+						gd_TrangChu.setVisible(true);
+						dispose();
 					}
 				} else {
 					JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu!");

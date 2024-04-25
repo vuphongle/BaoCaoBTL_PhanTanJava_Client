@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import dao.ChiTietHoaDonServices;
+import dao.ClientConnectionService;
 import dao.HoaDonDatPhongServices;
 import dao.KhachHangServices;
 import dao.LoaiPhongServices;
@@ -99,9 +100,11 @@ public class Dialog_PhongDangSD extends JDialog implements ActionListener {
 	private final TempPhongBiChuyenServices tempChuyen_dao;
 	private final GD_DatPhong datPhong;
 	private InetAddress ip;
+	private ClientConnectionService clientConnectionService;
 
 	public Dialog_PhongDangSD(String maPhong, GD_DatPhong datPhong) throws RemoteException, MalformedURLException, NotBoundException{
 		// kích thước giao diện
+		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
 		try {
 			ip = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
@@ -383,7 +386,7 @@ public class Dialog_PhongDangSD extends JDialog implements ActionListener {
 		if (o.equals(btnThemDV)) {
 			try {
 				String mnv = "";
-				Map<String, String> mapIP_MSNV = DataManager.getMapIP_MSNV();
+				Map<String, String> mapIP_MSNV = clientConnectionService.getMapIP_MSNV();
 				for (Map.Entry<String, String> entry : mapIP_MSNV.entrySet()) {
 					if (entry.getKey().equals(ip.getHostAddress())) {
 						mnv = entry.getValue();
