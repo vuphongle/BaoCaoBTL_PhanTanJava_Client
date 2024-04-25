@@ -414,7 +414,13 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 				for (Map.Entry<String, Boolean> entry : loadData.entrySet()) {
 					if(mnv.equals(entry.getKey())){
 						loadData(dsPhong);
-						entry.setValue(false);						
+						entry.setValue(false);
+						try {
+							clientConnectionService.setLoadData(loadData);
+						} catch (RemoteException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}						
 					}
 				}
 				
