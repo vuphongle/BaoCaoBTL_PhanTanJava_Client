@@ -114,17 +114,17 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 	Timer timerChayThongBao;
 	private final JButton btnBackPhongCho;
 	private InetAddress ip;
+	
 
 	/**
 	 * Create the panel.
 	 * 
 	 * @throws RemoteException
-	 * @throws UnknownHostException
-	 * @throws NotBoundException
-	 * @throws MalformedURLException
+	 * @throws UnknownHostException 
+	 * @throws NotBoundException 
+	 * @throws MalformedURLException 
 	 */
 	private ClientConnectionService clientConnectionService;
-
 	public GD_DatPhong(GD_TrangChu trangChu) throws RemoteException, UnknownHostException, MalformedURLException, NotBoundException {
 		
 		clientConnectionService = (ClientConnectionService) Naming.lookup(DataManager.getRmiURL() + "clientConnectionServices");
@@ -392,36 +392,6 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 					e1.printStackTrace();
 				}
 
-				try {
-					btnBackToBook.setEnabled(tmp_dao.getAllTemp().size() != 1);
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					btnBackThanhToan.setEnabled(tempTT_dao.getAllTemp().size() != 0);
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					btnBackHuyThanhToan.setEnabled(tempTT_dao.getAllTemp().size() != 0);
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
-
-				btnBackPhongCho.setEnabled(!DataManager.getMaPhongDatCho().equals(""));
-
-			}
-		});
-
-		//		Bắt đầu Timer
-		timer.start();
-
-		Timer timer2 = new Timer(1000, new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
 				Map<String, Boolean> loadData = null;
 				try {
 					loadData = clientConnectionService.getLoadData();
@@ -453,10 +423,33 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 						}						
 					}
 				}
+				
+				try {
+					btnBackToBook.setEnabled(tmp_dao.getAllTemp().size() != 1);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+
+				try {
+					btnBackThanhToan.setEnabled(tempTT_dao.getAllTemp().size() != 0);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+
+				try {
+					btnBackHuyThanhToan.setEnabled(tempTT_dao.getAllTemp().size() != 0);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+
+				btnBackPhongCho.setEnabled(!DataManager.getMaPhongDatCho().equals(""));
+
 			}
 		});
-		timer2.start();
-		
+
+		//		Bắt đầu Timer
+		timer.start();
+
 		//
 		Timer timerThongBao = new Timer(60000, new ActionListener() {
 
@@ -792,7 +785,7 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 
 	private int calculateSize() throws RemoteException {
 		int i = 0;
-
+		
 //		try {
 //			i = p_Service.getallPhongs().size();
 //		} catch (RemoteException e) {
@@ -804,7 +797,7 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 				i++;
 			}
 		}
-
+		
 		if (i <= 15) {
 			return 498;
 		} else if (i <= 20) {
@@ -813,7 +806,7 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 			return 540 + (((i - 1) / 5) - 3) * 130;
 		}
 	}
-
+	
 	private List<Phong> getCurrentListRoom() {
 		try {
 			PhongService phongService = (PhongService) Naming.lookup(DataManager.getRmiURL() + "phongServices");
@@ -823,7 +816,7 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 			e.printStackTrace();
 			return null;
 		}
-
+		
 	}
 
 	private void loadTimKiem(List<Phong> DSPhong) throws RemoteException {
@@ -1079,8 +1072,7 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 					if (p.getTrangThai() == Enum_TrangThai.Cho) {
 						try {
 							dialog_PhongCho = new Dialog_PhongCho(maPhong, trangChu);
-						} catch (RemoteException | UnknownHostException | MalformedURLException
-								| NotBoundException e1) {
+						} catch (RemoteException | UnknownHostException | MalformedURLException | NotBoundException e1) {
 							e1.printStackTrace();
 						}
 						dialog_PhongCho.setVisible(true);
@@ -1112,7 +1104,8 @@ public class GD_DatPhong extends JPanel implements ActionListener {
 				}
 			}
 		}
-
+		
+		
 		if (o.equals(btnLamMoi)) {
 			comboBox_LoaiPhong.setSelectedIndex(0);
 			comboBox_TrangThai.setSelectedIndex(0);
